@@ -2,7 +2,7 @@ from django import forms
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.contrib.auth.models import User
 from .models import Cargo, Empleado, Rol, TipoContrato, Departamento
-
+from django.core.validators import RegexValidator
 class CustomUserCreationForm(UserCreationForm):
     primer_nombre = forms.CharField(max_length=100, required=True, label="Primer Nombre", widget=forms.TextInput(attrs={'class': 'form-control'}))
     apellido = forms.CharField(max_length=100, required=True, label="Apellido", widget=forms.TextInput(attrs={'class': 'form-control'}))
@@ -67,9 +67,17 @@ class CargoForm(forms.ModelForm):
             if len(descripcion) < 3:
                 raise forms.ValidationError("La descripción debe tener al menos 3 caracteres.")
         return descripcion
+    
 class EmpleadoForm(forms.ModelForm):
     nombre = forms.CharField(label="Nombre", widget=forms.TextInput(attrs={'class': 'form-control'}))
-    cedula = forms.CharField(label="Cédula", widget=forms.TextInput(attrs={'class': 'form-control'}))
+    cedula = forms.CharField(
+        label="Cédula",
+        validators=[RegexValidator(regex='^\d+$', message='La cédula solo puede contener números')],
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'oninput': "this.value = this.value.replace(/[^0-9]/g, '')"
+        })
+    )
     direccion = forms.CharField(label="Dirección", widget=forms.TextInput(attrs={'class': 'form-control'}))
     sexo = forms.ChoiceField(
         choices=Empleado.SEXO_CHOICES,
@@ -101,31 +109,51 @@ class EmpleadoForm(forms.ModelForm):
         fields = ['nombre', 'cedula', 'direccion', 'sexo', 'sueldo', 'cargo', 'departamento', 'tipo_contrato']
 
 class DepartamentoForm(forms.ModelForm):
-    descripcion = forms.CharField(label="Descripción", widget=forms.TextInput(attrs={'class': 'form-control'}))
-
     class Meta:
         model = Departamento
-        fields = ['descripcion']
+        fields = ['descripcion']  # Ajusta según tus campos
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Agregar clase 'form-control' a todos los campos para Bootstrap
+        for field_name, field in self.fields.items():
+            field.widget.attrs.update({
+                'class': 'form-control',
+                'placeholder': f'Ingrese {field.label}',  # Opcional: placeholder dinámico
+            })
 
 class TipoContratoForm(forms.ModelForm):
-    descripcion = forms.CharField(label="Descripción", widget=forms.TextInput(attrs={'class': 'form-control'}))
+    nombre = forms.CharField(
+        label="Nombre",
+        widget=forms.TextInput(attrs={'class': 'form-control'})
+    )
+    descripcion = forms.CharField(
+        label="Descripción",
+        widget=forms.TextInput(attrs={'class': 'form-control'})
+    )
 
     class Meta:
         model = TipoContrato
-        fields = ['descripcion']
+        fields = ['nombre', 'descripcion']
+
 
 class RolForm(forms.ModelForm):
-    empleado = forms.ModelChoiceField(
-        queryset=Empleado.objects.all(),
-        label="Empleado",
-        empty_label="Seleccione el empleado",
-        widget=forms.Select(attrs={'class': 'form-select'})
+    aniomes = forms.CharField(
+        label="Año y Mes (YYYYMM)",
+        validators=[RegexValidator(r'^\d{6}$', 'Formato incorrecto. Debe ser YYYYMM')],
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ej: 202505'})
     )
-    anio_mes = forms.DateField(label="Año y Mes", widget=forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}))
-    sueldo = forms.DecimalField(label="Sueldo", widget=forms.NumberInput(attrs={'class': 'form-control'}))
-    horas_extra = forms.DecimalField(label="Horas Extras", widget=forms.NumberInput(attrs={'class': 'form-control'}))
-    bono = forms.DecimalField(label="Bono", widget=forms.NumberInput(attrs={'class': 'form-control'}))
 
     class Meta:
         model = Rol
-        fields = ['empleado', 'anio_mes', 'sueldo', 'horas_extra', 'bono']
+        fields = '__all__'
+        widgets = {
+            'sueldo': forms.NumberInput(attrs={'class': 'form-control'}),
+            'horas_extra': forms.NumberInput(attrs={'class': 'form-control'}),
+            'bono': forms.NumberInput(attrs={'class': 'form-control'}),
+            'iess': forms.NumberInput(attrs={'class': 'form-control'}),
+            'tot_ing': forms.NumberInput(attrs={'class': 'form-control'}),
+            'tot_des': forms.NumberInput(attrs={'class': 'form-control'}),
+            'neto': forms.NumberInput(attrs={'class': 'form-control'}),
+            'empleado': forms.Select(attrs={'class': 'form-control'}),
+        }

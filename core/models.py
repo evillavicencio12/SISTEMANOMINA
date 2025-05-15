@@ -23,15 +23,30 @@ class Cargo(models.Model):
         ordering = ['nivel', 'descripcion']
 
 class Departamento(models.Model):
-    descripcion = models.CharField(max_length=100)
+    descripcion = models.CharField("Descripción", max_length=100, unique=True)
+    codigo = models.CharField("Código", max_length=10, unique=True, blank=True, null=True)
+    activo = models.BooleanField("Activo", default=True)
+    fecha_modificacion = models.DateTimeField("Fecha de modificación", auto_now=True)
+    notas = models.TextField("Notas adicionales", blank=True, null=True)
+
+    class Meta:
+        verbose_name = "Departamento"
+        verbose_name_plural = "Departamentos"
+        ordering = ['descripcion']
+
     def __str__(self):
-        return self.descripcion
+        return f"{self.descripcion} ({self.codigo})" if self.codigo else self.descripcion
 
 class TipoContrato(models.Model):
-    descripcion = models.CharField(max_length=100)
-    def __str__(self):
-        return self.descripcion
+    nombre = models.CharField("Nombre del contrato", max_length=50, default="Contrato estándar")
+    descripcion = models.CharField("Descripción del contrato", max_length=100)
 
+    def __str__(self):
+        return f"{self.nombre} - {self.descripcion}"
+
+    class Meta:
+        verbose_name = "Tipo de Contrato"
+        verbose_name_plural = "Tipos de Contrato"
 
 class Empleado(models.Model):
     SEXO_CHOICES = [
@@ -55,7 +70,7 @@ class Empleado(models.Model):
 
 class Rol(models.Model):
     empleado = models.ForeignKey(Empleado, on_delete=models.CASCADE)
-    aniomes = models.DateField()#202501
+    aniomes = models.CharField(max_length=6)  
     sueldo = models.DecimalField(max_digits=10, decimal_places=2)
     horas_extra = models.DecimalField(max_digits=10, decimal_places=2)
     bono = models.DecimalField(max_digits=10, decimal_places=2)

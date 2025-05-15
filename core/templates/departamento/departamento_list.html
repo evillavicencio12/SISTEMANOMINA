@@ -1,14 +1,14 @@
 {% extends "home.html" %}
-{% block title %}Listado de {{ model_name|capfirst }}{% endblock %}
+{% block title %}Listado de Departamentos{% endblock %}
 
 {% block content %}
 <div class="container py-4">
-  <h2 class="mb-4">{{ title }}</h2>
+  <h2 class="mb-4">Listado de Departamentos</h2>
 
   <!-- Buscador -->
   <form method="get" class="row g-2 mb-3">
     <div class="col-md-6">
-      <input type="text" name="q" class="form-control" placeholder="Buscar por descripción..." value="{{ request.GET.q }}">
+      <input type="text" name="q" class="form-control" placeholder="Buscar por descripción..." value="{{ search_query }}">
     </div>
     <div class="col-md-2">
       <button type="submit" class="btn btn-primary w-100">Buscar</button>
@@ -17,8 +17,8 @@
 
   <!-- Botón crear -->
   <div class="mb-3 text-end">
-    <a href="{% url 'core:create_cargo' %}" class="btn btn-success">
-      <i class="fas fa-plus"></i> Crear {{ model_name|capfirst }}
+    <a href="{% url 'core:CrearDepartamento' %}" class="btn btn-success">
+      <i class="fas fa-plus"></i> Crear Departamento
     </a>
   </div>
 
@@ -28,29 +28,48 @@
       <thead>
         <tr>
           <th>ID</th>
-          {% for field in fields %}
-            <th>{{ field|capfirst }}</th>
-          {% endfor %}
+          <th>Descripción</th>
           <th>Acciones</th>
         </tr>
       </thead>
       <tbody>
-        {% for cargo in cargos %}
+        {% for departamento in departamentos %}
         <tr>
-          <td>{{ cargo.id }}</td>
-          {% for field in fields %}
-            <td>{{ cargo|get_attr:field }}</td>
-          {% endfor %}
+          <td>{{ departamento.id }}</td>
+          <td>{{ departamento.descripcion }}</td>
           <td>
-            <a href="{% url 'core:update_cargo' cargo.id %}" class="btn btn-sm btn-warning">Editar</a>
-            <a href="{% url 'core:delete_cargo' cargo.id %}" class="btn btn-sm btn-danger">Eliminar</a>
+            <a href="{% url 'core:UpdateDepartamento' departamento.id %}" class="btn btn-sm btn-warning">Editar</a>
+            <a href="{% url 'core:Eliminar' departamento.id 'Departamento' %}" class="btn btn-sm btn-danger">Eliminar</a>
           </td>
         </tr>
         {% empty %}
-        <tr><td colspan="99">No se encontraron resultados.</td></tr>
+        <tr><td colspan="3">No se encontraron resultados.</td></tr>
         {% endfor %}
       </tbody>
     </table>
   </div>
+
+  <!-- Paginación -->
+  {% if departamentos.has_other_pages %}
+  <nav aria-label="Page navigation">
+    <ul class="pagination">
+      {% if departamentos.has_previous %}
+        <li class="page-item">
+          <a class="page-link" href="?page={{ departamentos.previous_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}">Anterior</a>
+        </li>
+      {% endif %}
+      {% for num in departamentos.paginator.page_range %}
+        <li class="page-item {% if departamentos.number == num %}active{% endif %}">
+          <a class="page-link" href="?page={{ num }}{% if search_query %}&q={{ search_query }}{% endif %}">{{ num }}</a>
+        </li>
+      {% endfor %}
+      {% if departamentos.has_next %}
+        <li class="page-item">
+          <a class="page-link" href="?page={{ departamentos.next_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}">Siguiente</a>
+        </li>
+      {% endif %}
+    </ul>
+  </nav>
+  {% endif %}
 </div>
 {% endblock %}

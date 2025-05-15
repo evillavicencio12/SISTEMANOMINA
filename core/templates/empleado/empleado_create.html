@@ -5,11 +5,12 @@
 {% block content %}
 <div class="container py-4" style="max-width: 600px;">
   <h2>{{ title }}</h2>
-  <form method="post">
+  <form method="post" novalidate>
     {% csrf_token %}
     {{ form.as_p }}
     <div class="mt-3 d-flex justify-content-between">
       <button type="submit" class="btn btn-primary">Guardar</button>
+      <!-- Asegúrate que la URL 'core:EmpleadoList' exista y muestre la lista -->
       <a href="{% url 'core:Lista' %}" class="btn btn-secondary">Cancelar</a>
     </div>
   </form>

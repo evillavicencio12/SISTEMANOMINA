@@ -21,11 +21,11 @@ def Inicio(request):
 def Lista(request):
     search_query = request.GET.get('q', '')
     empleados = Empleado.objects.all()
+
     if search_query:
-        empleados = empleados.filter(
-            Q(nombre__icontains=search_query) | Q(cedula__icontains=search_query)
-        )
-    paginator = Paginator(empleados, 10)
+        empleados = empleados.filter(nombre__icontains=search_query)
+
+    paginator = Paginator(empleados, 10)  # 10 empleados por página
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
 
@@ -66,15 +66,25 @@ def singout(request):
 
 @login_required
 def Departamentos(request):
+    search_query = request.GET.get('q', '').strip()
     departamentos = Departamento.objects.all()
-    search_query = request.GET.get('q', '')
+
     if search_query:
         departamentos = departamentos.filter(descripcion__icontains=search_query)
+
     paginator = Paginator(departamentos, 10)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
-    return render(request, 'departamento/departamento_list.html', {'departamentos': page_obj, 'search_query': search_query})
 
+    context = {
+        'departamentos': page_obj,
+        'search_query': search_query,
+        'model_name': 'departamento',
+        'title': 'Listado de Departamentos',
+        # Otros campos si quieres
+    }
+
+    return render(request, 'departamento/departamento_list.html', context)
 @login_required
 def Cargos(request):
     cargos = Cargo.objects.all()
@@ -148,7 +158,7 @@ def CrearEmpleado(request):
     else:
         form = EmpleadoForm()
     context['form'] = form
-    return render(request, 'empleado/empleado_form.html', context)
+    return render(request, 'empleado/empleado_create.html', context)
 
 @login_required
 def CrearDepartamento(request):
@@ -240,10 +250,24 @@ def UpdateContrato(request, id):
         if form.is_valid():
             form.save()
             messages.success(request, 'Tipo de contrato actualizado correctamente')
-            return redirect('core:Contrato')
+            return redirect('core:Contrato')  # <-- Cambia aquí si tienes otro nombre para la lista
     else:
         form = TipoContratoForm(instance=tipo_contrato)
     return render(request, 'tipoContrato/tipoContrato_update.html', {'form': form})
+
+@login_required
+def DeleteContrato(request, id):
+    contrato = get_object_or_404(TipoContrato, pk=id)
+
+    if request.method == 'POST':
+        contrato.delete()
+        messages.success(request, 'Tipo de contrato eliminado correctamente.')
+        return redirect('core:Contrato')  # Asegúrate que este sea el nombre correcto para la lista de contratos
+
+    return render(request, 'tipoContrato/tipoContrato_delete.html', {
+        'contrato': contrato,
+        'title': f'Eliminar Tipo de Contrato: {contrato.nombre}',
+    })
 
 @login_required
 def UpdateNomina(request, id):
@@ -263,23 +287,25 @@ def UpdateNomina(request, id):
 # Vistas de eliminar
 @login_required
 def Eliminar(request, id, modelo):
-    if modelo == "Empleado":
+    modelo_lower = modelo.lower()
+
+    if modelo_lower == "empleado":
         obj = get_object_or_404(Empleado, pk=id)
         template = 'empleado/empleado_delete.html'
         redirect_url = 'core:Lista'
-    elif modelo == "Nomina":
+    elif modelo_lower == "nomina":
         obj = get_object_or_404(Rol, pk=id)
         template = 'rol/rol_delete.html'
         redirect_url = 'core:Nominas'
-    elif modelo == "Cargo":
+    elif modelo_lower == "cargo":
         obj = get_object_or_404(Cargo, pk=id)
         template = 'cargo/cargo_delete.html'
         redirect_url = 'core:Cargos'
-    elif modelo == "Departamento":
+    elif modelo_lower == "departamento":
         obj = get_object_or_404(Departamento, pk=id)
         template = 'departamento/departamento_delete.html'
         redirect_url = 'core:Departamentos'
-    elif modelo == "Contrato":
+    elif modelo_lower == "contrato":
         obj = get_object_or_404(TipoContrato, pk=id)
         template = 'tipoContrato/tipoContrato_delete.html'
         redirect_url = 'core:Contrato'
@@ -289,6 +315,31 @@ def Eliminar(request, id, modelo):
 
     if request.method == 'POST':
         obj.delete()
-        messages.success(request, f'{modelo} eliminado correctamente.')
+        messages.success(request, f'{modelo.capitalize()} eliminado correctamente.')
         return redirect(redirect_url)
-    return render(request, template, {modelo.lower(): obj})
+    return render(request, template, {modelo_lower: obj})
+
+def DeleteDepartamento(request, id):
+    departamento = get_object_or_404(Departamento, id=id)
+
+    if request.method == 'POST':
+        departamento.delete()
+        return redirect(reverse('core:ListadoDepartamento'))  # Ajusta este nombre a tu URL de listado
+
+    return render(request, 'core/delete_departamento.html', {
+        'departamento': departamento,
+        'title': f'Eliminar Departamento: {departamento.nombre}',  # o el campo que uses para mostrar
+    })
+@login_required
+def DeleteEmpleado(request, id):
+    empleado = get_object_or_404(Empleado, pk=id)
+
+    if request.method == 'POST':
+        empleado.delete()
+        messages.success(request, 'Empleado eliminado correctamente.')
+        return redirect('core:Lista')  # URL de la lista de empleados
+
+    return render(request, 'empleado/empleado_delete.html', {
+        'empleado': empleado,
+        'title': f'Eliminar Empleado: {empleado.nombre}',
+    })

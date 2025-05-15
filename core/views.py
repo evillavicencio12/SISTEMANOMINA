@@ -12,25 +12,12 @@ from django.http import HttpResponse
 def home(request):
     return render(request, 'home.html')
 
-def hr_required(view_func):
-    decorated_view_func = user_passes_test(
-        lambda u: u.groups.filter(name='HR Managers').exists(),
-        login_url='core:signin'
-    )(view_func)
-    return decorated_view_func
 
 @login_required
 def Inicio(request):
     return render(request, 'home.html')
 
-
-# Vistas de presentación
 @login_required
-def Inicio(request):
-    return render(request, 'home.html')
-
-@login_required
-@hr_required
 def Lista(request):
     empleados = Empleado.objects.all()
     search_query = request.GET.get('q', '')
@@ -71,7 +58,6 @@ def singout(request):
     return redirect('core:Inicio')
 
 @login_required
-@hr_required
 def Departamentos(request):
     departamentos = Departamento.objects.all()
     search_query = request.GET.get('q', '')
@@ -83,7 +69,6 @@ def Departamentos(request):
     return render(request, 'departamento/departamento_list.html', {'departamentos': page_obj, 'search_query': search_query})
 
 @login_required
-@hr_required
 def Cargos(request):
     cargos = Cargo.objects.all()
     search_query = request.GET.get('q', '')
@@ -95,7 +80,6 @@ def Cargos(request):
     return render(request, 'cargo/cargo_list.html', {'cargos': page_obj, 'search_query': search_query})
 
 @login_required
-@hr_required
 def Contrato(request):
     tipo_contratos = TipoContrato.objects.all()
     search_query = request.GET.get('q', '')
@@ -107,7 +91,6 @@ def Contrato(request):
     return render(request, 'tipoContrato/tipoContrato_list.html', {'tipo_contratos': page_obj, 'search_query': search_query})
 
 @login_required
-@hr_required
 def Nominas(request):
     roles = Rol.objects.all()
     search_query = request.GET.get('q', '')
@@ -120,7 +103,6 @@ def Nominas(request):
 
 # Vistas de crear
 @login_required
-@hr_required
 def CrearCargo(request):
     context = {'title': 'Ingresar Cargo'}
     if request.method == 'POST':
@@ -135,7 +117,6 @@ def CrearCargo(request):
     return render(request, 'cargo/cargo_create.html', context)
 
 @login_required
-@hr_required
 def CrearEmpleado(request):
     context = {'title': 'Ingresar Empleado'}
     if request.method == 'POST':
@@ -150,7 +131,6 @@ def CrearEmpleado(request):
     return render(request, 'empleado/empleado_create.html', context)
 
 @login_required
-@hr_required
 def CrearDepartamento(request):
     context = {'title': 'Ingresar Departamento'}
     if request.method == 'POST':
@@ -165,7 +145,6 @@ def CrearDepartamento(request):
     return render(request, 'departamento/departamento_create.html', context)
 
 @login_required
-@hr_required
 def CrearContrato(request):
     context = {'title': 'Ingresar Tipo de Contrato'}
     if request.method == 'POST':
@@ -180,7 +159,6 @@ def CrearContrato(request):
     return render(request, 'tipoContrato/tipoContrato_create.html', context)
 
 @login_required
-@hr_required
 def CrearNominas(request):
     context = {'title': 'Ingresar Rol de Pago'}
     if request.method == 'POST':
@@ -196,7 +174,6 @@ def CrearNominas(request):
 
 # Vistas de actualizar
 @login_required
-@hr_required
 def UpdateCargo(request, id):
     cargo = get_object_or_404(Cargo, pk=id)
     if request.method == 'POST':
@@ -210,7 +187,6 @@ def UpdateCargo(request, id):
     return render(request, 'cargo/cargo_update.html', {'form': form})
 
 @login_required
-@hr_required
 def UpdateEmpleado(request, id):
     empleado = get_object_or_404(Empleado, pk=id)
     if request.method == 'POST':
@@ -224,7 +200,6 @@ def UpdateEmpleado(request, id):
     return render(request, 'empleado/empleado_update.html', {'form': form})
 
 @login_required
-@hr_required
 def UpdateDepartamento(request, id):
     departamento = get_object_or_404(Departamento, pk=id)
     if request.method == 'POST':
@@ -238,7 +213,6 @@ def UpdateDepartamento(request, id):
     return render(request, 'departamento/departamento_update.html', {'form': form})
 
 @login_required
-@hr_required
 def UpdateContrato(request, id):
     tipo_contrato = get_object_or_404(TipoContrato, pk=id)
     if request.method == 'POST':
@@ -252,7 +226,6 @@ def UpdateContrato(request, id):
     return render(request, 'tipoContrato/tipoContrato_update.html', {'form': form})
 
 @login_required
-@hr_required
 def UpdateNomina(request, id):
     rol = get_object_or_404(Rol, pk=id)
     context = {'title': 'Actualizar Rol de Pago'}
@@ -269,7 +242,6 @@ def UpdateNomina(request, id):
 
 # Vistas de eliminar
 @login_required
-@hr_required
 def Eliminar(request, id, modelo):
     if modelo == "Empleado":
         obj = get_object_or_404(Empleado, pk=id)

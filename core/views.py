@@ -19,14 +19,21 @@ def Inicio(request):
 
 @login_required
 def Lista(request):
-    empleados = Empleado.objects.all()
     search_query = request.GET.get('q', '')
+    empleados = Empleado.objects.all()
     if search_query:
-        empleados = empleados.filter(nombre__icontains=search_query) | empleados.filter(cedula__icontains=search_query)
+        empleados = empleados.filter(
+            Q(nombre__icontains=search_query) | Q(cedula__icontains=search_query)
+        )
     paginator = Paginator(empleados, 10)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
-    return render(request, 'empleado/empleado_list.html', {'empleados': page_obj, 'search_query': search_query})
+
+    context = {
+        'empleados': page_obj,
+        'search_query': search_query,
+    }
+    return render(request, 'empleado/empleado_list.html', context)
 
 def signup(request):
     if request.method == 'POST':
@@ -77,7 +84,13 @@ def Cargos(request):
     paginator = Paginator(cargos, 10)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
-    return render(request, 'cargo/cargo_list.html', {'cargos': page_obj, 'search_query': search_query})
+    return render(request, 'cargo/cargo_list.html', {
+        'cargos': page_obj,
+        'search_query': search_query,
+        'model_name': 'cargo',
+        'title': 'Listado de Cargos',
+        'fields': ['descripcion', 'codigo']  # Puedes personalizar aquí qué campos mostrar
+    })
 
 @login_required
 def vista_contratos(request):
@@ -116,6 +129,13 @@ def CrearCargo(request):
     context['form'] = form
     return render(request, 'cargo/cargo_create.html', context)
 
+@login_required
+def delete_cargo(request, pk):
+    cargo = get_object_or_404(Cargo, pk=pk)
+    if request.method == 'POST':
+        cargo.delete()
+        return redirect('core:Cargos')
+    return render(request, 'cargo/cargo_delete.html', {'cargo': cargo})
 @login_required
 def CrearEmpleado(request):
     context = {'title': 'Ingresar Empleado'}

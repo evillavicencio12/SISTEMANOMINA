@@ -24,4 +24,5 @@ urlpatterns = [
     path('contratos/update/<int:id>/', views.UpdateContrato, name='UpdateContrato'),
     path('nominas/update/<int:id>/', views.UpdateNomina, name='UpdateNomina'),
     path('eliminar/<int:id>/<str:modelo>/', views.Eliminar, name='Eliminar'),
+    path('cargos/eliminar/<int:pk>/', views.delete_cargo, name='delete_cargo'),
 ]

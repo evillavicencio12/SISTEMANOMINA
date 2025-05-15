@@ -1,16 +1,31 @@
-
 {% extends 'home.html' %}
 
 {% block title %}BancoNómina - Crear Cargo{% endblock %}
 
 {% block content %}
-<main class="container">
-    <h1 class="text-center my-4">Crear Cargo</h1>
-    <form method="post" class="card card-body col-md-6 offset-md-3">
+<main class="container my-5">
+    <h1 class="text-center mb-4">Crear Cargo</h1>
+    <form method="post" class="card card-body col-md-6 offset-md-3" novalidate>
         {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit" class="btn btn-primary">Guardar</button>
-        <a href="{% url 'core:Cargos' %}" class="btn btn-secondary">Cancelar</a>
+        {% for field in form %}
+            <div class="mb-3">
+                <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                {{ field }}
+
+                {% if field.help_text %}
+                    <div class="form-text">{{ field.help_text }}</div>
+                {% endif %}
+
+                {% for error in field.errors %}
+                    <div class="text-danger small">{{ error }}</div>
+                {% endfor %}
+            </div>
+        {% endfor %}
+
+        <div class="d-flex justify-content-between">
+            <button type="submit" class="btn btn-primary">Guardar</button>
+            <a href="{% url 'core:Cargos' %}" class="btn btn-secondary">Cancelar</a>
+        </div>
     </form>
 </main>
 {% endblock %}

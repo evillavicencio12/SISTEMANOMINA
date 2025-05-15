@@ -1,5 +1,5 @@
 {% extends "home.html" %}
-{% load static %}
+
 {% block title %}Listado de {{ model_name|capfirst }}{% endblock %}
 
 {% block content %}
@@ -8,14 +8,9 @@
 
   <!-- Buscador -->
   <form method="get" class="row g-2 mb-3">
-    <div class="col-md-5">
-      <input type="text" name="q" class="form-control" placeholder="Buscar por nombre o descripción..." value="{{ request.GET.q }}">
+    <div class="col-md-6">
+      <input type="text" name="q" class="form-control" placeholder="Buscar por descripción..." value="{{ search_query }}">
     </div>
-    {% if model_name == 'empleado' %}
-    <div class="col-md-5">
-      <input type="text" name="q2" class="form-control" placeholder="Buscar por cédula..." value="{{ request.GET.q2 }}">
-    </div>
-    {% endif %}
     <div class="col-md-2">
       <button type="submit" class="btn btn-primary w-100">Buscar</button>
     </div>
@@ -23,7 +18,7 @@
 
   <!-- Botón crear -->
   <div class="mb-3 text-end">
-    <a href="{% url 'core:create_nomina' %}" class="btn btn-success">
+    <a href="{% url 'core:CrearCargo' %}" class="btn btn-success">
       <i class="fas fa-plus"></i> Crear {{ model_name|capfirst }}
     </a>
   </div>
@@ -41,22 +36,61 @@
         </tr>
       </thead>
       <tbody>
-        {% for obj in objects %}
+        {% for cargo in cargos %}
         <tr>
-          <td>{{ obj.id }}</td>
+          <td>{{ cargo.id }}</td>
           {% for field in fields %}
-            <td>{{ objeto.atributo }}</td>
+            {% if field == 'descripcion' %}
+              <td>{{ cargo.descripcion }}</td>
+            {% elif field == 'nivel' %}
+              <td>{{ cargo.nivel }}</td>
+            {% elif field == 'responsabilidades' %}
+              <td>{{ cargo.responsabilidades }}</td>
+            {% elif field == 'salario_base' %}
+              <td>{{ cargo.salario_base }}</td>
+            {% else %}
+              <td>{{ cargo|default_if_none:"-" }}</td>
+            {% endif %}
           {% endfor %}
           <td>
-            <a href="{% url 'core:update_nomina' model_name obj.id %}" class="btn btn-sm btn-warning">Editar</a>
-            <a href="{% url 'core:delete_nomina' model_name obj.id %}" class="btn btn-sm btn-danger">Eliminar</a>
+            <a href="{% url 'core:UpdateCargo' cargo.id %}" class="btn btn-sm btn-warning">Editar</a>
+            <a href="{% url 'core:delete_cargo' cargo.id %}" class="btn btn-sm btn-danger">Eliminar</a>
           </td>
         </tr>
         {% empty %}
-        <tr><td colspan="99">No se encontraron resultados.</td></tr>
+        <tr><td colspan="99" class="text-center">No se encontraron resultados.</td></tr>
         {% endfor %}
       </tbody>
     </table>
   </div>
+
+  <!-- Paginación -->
+  <nav>
+    <ul class="pagination justify-content-center">
+      {% if cargos.has_previous %}
+      <li class="page-item">
+        <a class="page-link" href="?q={{ search_query }}&page={{ cargos.previous_page_number }}">Anterior</a>
+      </li>
+      {% else %}
+      <li class="page-item disabled"><span class="page-link">Anterior</span></li>
+      {% endif %}
+
+      {% for num in cargos.paginator.page_range %}
+        {% if cargos.number == num %}
+          <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+        {% else %}
+          <li class="page-item"><a class="page-link" href="?q={{ search_query }}&page={{ num }}">{{ num }}</a></li>
+        {% endif %}
+      {% endfor %}
+
+      {% if cargos.has_next %}
+      <li class="page-item">
+        <a class="page-link" href="?q={{ search_query }}&page={{ cargos.next_page_number }}">Siguiente</a>
+      </li>
+      {% else %}
+      <li class="page-item disabled"><span class="page-link">Siguiente</span></li>
+      {% endif %}
+    </ul>
+  </nav>
 </div>
 {% endblock %}

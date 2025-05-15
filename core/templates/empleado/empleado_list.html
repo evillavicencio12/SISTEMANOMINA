@@ -2,8 +2,11 @@
 
 {% block content %}
 <div class="card shadow mt-4 mx-auto" style="max-width: 700px;">
-  <div class="card-header bg-primary text-white">
+  <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
     <h3 class="mb-0">Lista de Empleados</h3>
+    <a href="{% url 'core:CrearEmpleado' %}" class="btn btn-success btn-sm">
+      <i class="fas fa-plus"></i> Crear Empleado
+    </a>
   </div>
   <div class="card-body">
     <form method="get" action="." class="mb-4 d-flex">
@@ -14,8 +17,14 @@
     <ul class="list-group mb-4">
       {% for empleado in empleados %}
         <li class="list-group-item d-flex justify-content-between align-items-center">
-          <span>{{ empleado.nombre }}</span>
-          <small class="text-muted">{{ empleado.cedula }}</small>
+          <div>
+            <strong>{{ empleado.nombre }}</strong><br>
+            <small class="text-muted">Cédula: {{ empleado.cedula }}</small>
+          </div>
+          <div>
+            <a href="{% url 'core:UpdateEmpleado' empleado.id %}" class="btn btn-warning btn-sm me-1">Editar</a>
+            <a href="{% url 'core:DeleteEmpleado' empleado.id %}" class="btn btn-danger btn-sm">Eliminar</a>
+          </div>
         </li>
       {% empty %}
         <li class="list-group-item">No hay empleados que mostrar.</li>

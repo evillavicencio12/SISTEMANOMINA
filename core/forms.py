@@ -22,13 +22,51 @@ class CustomLoginForm(AuthenticationForm):
     username = forms.CharField(label='Usuario', widget=forms.TextInput(attrs={'class': 'form-control'}))
     password = forms.CharField(label="Contraseña", widget=forms.PasswordInput(attrs={'class': 'form-control'}))
 
+
 class CargoForm(forms.ModelForm):
-    descripcion = forms.CharField(label="Descripción", widget=forms.TextInput(attrs={'class': 'form-control'}))
+    descripcion = forms.CharField(
+        label="Descripción del Cargo",
+        max_length=100,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Ingrese la descripción del cargo',
+            'autocomplete': 'off',
+        }),
+        help_text="Máximo 100 caracteres."
+    )
+    nivel = forms.IntegerField(
+        label="Nivel Jerárquico",
+        min_value=1,
+        max_value=10,
+        widget=forms.NumberInput(attrs={'class': 'form-control'}),
+        help_text="Nivel jerárquico del cargo (1-10)"
+    )
+    responsabilidades = forms.CharField(
+        label="Responsabilidades",
+        required=False,
+        widget=forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
+        help_text="Responsabilidades y funciones del cargo"
+    )
+    salario_base = forms.DecimalField(
+        label="Salario Base",
+        required=False,
+        max_digits=10,
+        decimal_places=2,
+        widget=forms.NumberInput(attrs={'class': 'form-control'}),
+        help_text="Salario base recomendado"
+    )
 
     class Meta:
         model = Cargo
-        fields = ['descripcion']
+        fields = ['descripcion', 'nivel', 'responsabilidades', 'salario_base']
 
+    def clean_descripcion(self):
+        descripcion = self.cleaned_data.get('descripcion')
+        if descripcion:
+            descripcion = descripcion.strip()
+            if len(descripcion) < 3:
+                raise forms.ValidationError("La descripción debe tener al menos 3 caracteres.")
+        return descripcion
 class EmpleadoForm(forms.ModelForm):
     nombre = forms.CharField(label="Nombre", widget=forms.TextInput(attrs={'class': 'form-control'}))
     cedula = forms.CharField(label="Cédula", widget=forms.TextInput(attrs={'class': 'form-control'}))

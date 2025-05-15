@@ -1,5 +1,4 @@
 {% extends "home.html" %}
-{% load static %}
 {% block title %}Listado de {{ model_name|capfirst }}{% endblock %}
 
 {% block content %}
@@ -8,14 +7,9 @@
 
   <!-- Buscador -->
   <form method="get" class="row g-2 mb-3">
-    <div class="col-md-5">
-      <input type="text" name="q" class="form-control" placeholder="Buscar por nombre o descripción..." value="{{ request.GET.q }}">
+    <div class="col-md-6">
+      <input type="text" name="q" class="form-control" placeholder="Buscar por descripción..." value="{{ request.GET.q }}">
     </div>
-    {% if model_name == 'empleado' %}
-    <div class="col-md-5">
-      <input type="text" name="q2" class="form-control" placeholder="Buscar por cédula..." value="{{ request.GET.q2 }}">
-    </div>
-    {% endif %}
     <div class="col-md-2">
       <button type="submit" class="btn btn-primary w-100">Buscar</button>
     </div>
@@ -23,7 +17,7 @@
 
   <!-- Botón crear -->
   <div class="mb-3 text-end">
-    <a href="{% url 'core:create_nomina' %}" class="btn btn-success">
+    <a href="{% url 'core:create_cargo' %}" class="btn btn-success">
       <i class="fas fa-plus"></i> Crear {{ model_name|capfirst }}
     </a>
   </div>
@@ -41,15 +35,15 @@
         </tr>
       </thead>
       <tbody>
-        {% for obj in objects %}
+        {% for cargo in cargos %}
         <tr>
-          <td>{{ obj.id }}</td>
+          <td>{{ cargo.id }}</td>
           {% for field in fields %}
-            <td>{{ objeto.atributo }}</td>
+            <td>{{ cargo|get_attr:field }}</td>
           {% endfor %}
           <td>
-            <a href="{% url 'core:update_nomina' model_name obj.id %}" class="btn btn-sm btn-warning">Editar</a>
-            <a href="{% url 'core:delete_nomina' model_name obj.id %}" class="btn btn-sm btn-danger">Eliminar</a>
+            <a href="{% url 'core:update_cargo' cargo.id %}" class="btn btn-sm btn-warning">Editar</a>
+            <a href="{% url 'core:delete_cargo' cargo.id %}" class="btn btn-sm btn-danger">Eliminar</a>
           </td>
         </tr>
         {% empty %}

@@ -1,12 +1,26 @@
 from django.db import models
 
 # Create your models here.
-from django.db import models
-
 class Cargo(models.Model):
-    descripcion = models.CharField(max_length=100)
+    # Descripción del cargo o puesto que ocupa un empleado en la empresa
+    descripcion = models.CharField(max_length=100, unique=True, help_text="Nombre o descripción del cargo")
+
+    # Opcional: un campo para el nivel jerárquico del cargo (por ejemplo, 1 = bajo, 5 = alto)
+    nivel = models.PositiveSmallIntegerField(default=1, help_text="Nivel jerárquico del cargo (1-10)")
+
+    # Opcional: una breve descripción de las responsabilidades principales del cargo
+    responsabilidades = models.TextField(blank=True, help_text="Responsabilidades y funciones del cargo")
+
+    # Opcional: salario base recomendado para este cargo (puede ayudar para validaciones o reportes)
+    salario_base = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True, help_text="Salario base recomendado")
+
     def __str__(self):
         return self.descripcion
+
+    class Meta:
+        verbose_name = "Cargo"
+        verbose_name_plural = "Cargos"
+        ordering = ['nivel', 'descripcion']
 
 class Departamento(models.Model):
     descripcion = models.CharField(max_length=100)

@@ -1,0 +1,16 @@
+
+{% extends 'home.html' %}
+
+{% block title %}BancoNómina - Crear Cargo{% endblock %}
+
+{% block content %}
+<main class="container">
+    <h1 class="text-center my-4">Crear Cargo</h1>
+    <form method="post" class="card card-body col-md-6 offset-md-3">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Guardar</button>
+        <a href="{% url 'core:Cargos' %}" class="btn btn-secondary">Cancelar</a>
+    </form>
+</main>
+{% endblock %}

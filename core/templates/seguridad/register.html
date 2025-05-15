@@ -1,0 +1,33 @@
+{% extends 'home.html' %}
+
+{% block title %}BancoNómina - Registro{% endblock %}
+
+{% block content %}
+<main class="container">
+    <div class="row">
+        <div class="col-md-4 offset-md-4 mt-3">
+            <h1 class="text-center">Regístrate Ahora</h1>
+            {% if form.errors %}
+                <div class="alert alert-danger">
+                    <p>Por favor, corrige los errores en el formulario.</p>
+                    <ul>
+                        {% for field, errors in form.errors.items %}
+                            {% for error in errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+            <form method="post" class="card card-body" action="{% url 'core:signup' %}">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button type="submit" class="btn btn-primary">Registrarse</button>
+            </form>
+            <p class="text-center mt-3">
+                ¿Ya tienes una cuenta? <a href="{% url 'core:signin' %}">Inicia sesión</a>
+            </p>
+        </div>
+    </div>
+</main>
+{% endblock %}

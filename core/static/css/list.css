@@ -1,0 +1,15 @@
+.search-container {
+    margin-bottom: 20px;
+  }
+  
+  .badge-department {
+    background-color: var(--primary);
+  }
+  
+  .badge-position {
+    background-color: var(--secondary);
+  }
+  
+  .badge-contract {
+    background-color: var(--accent);
+  }

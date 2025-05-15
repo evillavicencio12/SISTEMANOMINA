@@ -1,0 +1,31 @@
+{% extends "home.html" %}
+
+{% block content %}
+<h1>Lista de Empleados</h1>
+
+<form method="get" action=".">
+  <input type="text" name="q" value="{{ search_query }}" placeholder="Buscar empleados...">
+  <button type="submit">Buscar</button>
+</form>
+
+<ul>
+  {% for empleado in empleados %}
+  <li>{{ empleado.nombre }} - {{ empleado.cedula }}</li>
+  {% empty %}
+  <li>No hay empleados que mostrar.</li>
+  {% endfor %}
+</ul>
+
+<div>
+  <span>Página {{ empleados.number }} de {{ empleados.paginator.num_pages }}</span>
+</div>
+
+<div>
+  {% if empleados.has_previous %}
+    <a href="?page={{ empleados.previous_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}">Anterior</a>
+  {% endif %}
+  {% if empleados.has_next %}
+    <a href="?page={{ empleados.next_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}">Siguiente</a>
+  {% endif %}
+</div>
+{% endblock %}

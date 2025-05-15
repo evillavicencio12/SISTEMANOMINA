@@ -80,7 +80,7 @@ def Cargos(request):
     return render(request, 'cargo/cargo_list.html', {'cargos': page_obj, 'search_query': search_query})
 
 @login_required
-def Contrato(request):
+def vista_contratos(request):
     tipo_contratos = TipoContrato.objects.all()
     search_query = request.GET.get('q', '')
     if search_query:
@@ -128,7 +128,7 @@ def CrearEmpleado(request):
     else:
         form = EmpleadoForm()
     context['form'] = form
-    return render(request, 'empleado/empleado_create.html', context)
+    return render(request, 'empleado/empleado_form.html', context)
 
 @login_required
 def CrearDepartamento(request):

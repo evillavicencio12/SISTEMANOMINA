@@ -1,21 +1,16 @@
 {% extends "home.html" %}
-{% load static %}
-{% block title %}Listado de {{ model_name|capfirst }}{% endblock %}
+
+{% block title %}Listado de Contratos{% endblock %}
 
 {% block content %}
 <div class="container py-4">
-  <h2 class="mb-4">{{ title }}</h2>
+  <h2 class="mb-4">Listado de Contratos</h2>
 
   <!-- Buscador -->
   <form method="get" class="row g-2 mb-3">
-    <div class="col-md-5">
-      <input type="text" name="q" class="form-control" placeholder="Buscar por nombre o descripción..." value="{{ request.GET.q }}">
+    <div class="col-md-10">
+      <input type="text" name="q" class="form-control" placeholder="Buscar por descripción..." value="{{ search_query }}">
     </div>
-    {% if model_name == 'empleado' %}
-    <div class="col-md-5">
-      <input type="text" name="q2" class="form-control" placeholder="Buscar por cédula..." value="{{ request.GET.q2 }}">
-    </div>
-    {% endif %}
     <div class="col-md-2">
       <button type="submit" class="btn btn-primary w-100">Buscar</button>
     </div>
@@ -23,8 +18,8 @@
 
   <!-- Botón crear -->
   <div class="mb-3 text-end">
-    <a href="{% url 'core:create_nomina' %}" class="btn btn-success">
-      <i class="fas fa-plus"></i> Crear {{ model_name|capfirst }}
+    <a href="{% url 'core:CrearContrato' %}" class="btn btn-success">
+      <i class="fas fa-plus"></i> Crear Contrato
     </a>
   </div>
 
@@ -34,29 +29,51 @@
       <thead>
         <tr>
           <th>ID</th>
-          {% for field in fields %}
-            <th>{{ field|capfirst }}</th>
-          {% endfor %}
+          <th>Nombre</th>
+          <th>Descripción</th>
           <th>Acciones</th>
         </tr>
       </thead>
       <tbody>
-        {% for obj in objects %}
+        {% for obj in tipo_contratos %}
         <tr>
           <td>{{ obj.id }}</td>
-          {% for field in fields %}
-            <td>{{ objeto.atributo }}</td>
-          {% endfor %}
+          <td>{{ obj.nombre }}</td>
+          <td>{{ obj.descripcion }}</td>
           <td>
-            <a href="{% url 'core:update_nomina' model_name obj.id %}" class="btn btn-sm btn-warning">Editar</a>
-            <a href="{% url 'core:delete_nomina' model_name obj.id %}" class="btn btn-sm btn-danger">Eliminar</a>
+            <a href="{% url 'core:UpdateContrato' obj.id %}" class="btn btn-sm btn-warning">Editar</a>
+            <a href="{% url 'core:Eliminar' obj.id 'contrato' %}" class="btn btn-sm btn-danger">Eliminar</a>
           </td>
         </tr>
         {% empty %}
-        <tr><td colspan="99">No se encontraron resultados.</td></tr>
+        <tr>
+          <td colspan="4" class="text-center">No se encontraron contratos.</td>
+        </tr>
         {% endfor %}
       </tbody>
     </table>
   </div>
+
+  <!-- Paginación -->
+  {% if tipo_contratos.has_other_pages %}
+  <nav>
+    <ul class="pagination justify-content-center">
+      {% if tipo_contratos.has_previous %}
+      <li class="page-item">
+        <a class="page-link" href="?page={{ tipo_contratos.previous_page_number }}&q={{ search_query }}">Anterior</a>
+      </li>
+      {% endif %}
+      <li class="page-item disabled">
+        <span class="page-link">Página {{ tipo_contratos.number }} de {{ tipo_contratos.paginator.num_pages }}</span>
+      </li>
+      {% if tipo_contratos.has_next %}
+      <li class="page-item">
+        <a class="page-link" href="?page={{ tipo_contratos.next_page_number }}&q={{ search_query }}">Siguiente</a>
+      </li>
+      {% endif %}
+    </ul>
+  </nav>
+  {% endif %}
+
 </div>
 {% endblock %}

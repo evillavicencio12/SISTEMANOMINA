@@ -1,31 +1,44 @@
 {% extends "home.html" %}
 
 {% block content %}
-<h1>Lista de Empleados</h1>
+<div class="card shadow mt-4 mx-auto" style="max-width: 700px;">
+  <div class="card-header bg-primary text-white">
+    <h3 class="mb-0">Lista de Empleados</h3>
+  </div>
+  <div class="card-body">
+    <form method="get" action="." class="mb-4 d-flex">
+      <input type="text" name="q" value="{{ search_query }}" placeholder="Buscar empleados..." class="form-control me-2">
+      <button type="submit" class="btn btn-primary">Buscar</button>
+    </form>
 
-<form method="get" action=".">
-  <input type="text" name="q" value="{{ search_query }}" placeholder="Buscar empleados...">
-  <button type="submit">Buscar</button>
-</form>
+    <ul class="list-group mb-4">
+      {% for empleado in empleados %}
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+          <span>{{ empleado.nombre }}</span>
+          <small class="text-muted">{{ empleado.cedula }}</small>
+        </li>
+      {% empty %}
+        <li class="list-group-item">No hay empleados que mostrar.</li>
+      {% endfor %}
+    </ul>
 
-<ul>
-  {% for empleado in empleados %}
-  <li>{{ empleado.nombre }} - {{ empleado.cedula }}</li>
-  {% empty %}
-  <li>No hay empleados que mostrar.</li>
-  {% endfor %}
-</ul>
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <span>Página {{ empleados.number }} de {{ empleados.paginator.num_pages }}</span>
+    </div>
 
-<div>
-  <span>Página {{ empleados.number }} de {{ empleados.paginator.num_pages }}</span>
-</div>
+    <div class="d-flex justify-content-between">
+      {% if empleados.has_previous %}
+        <a href="?page={{ empleados.previous_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}" class="btn btn-outline-primary">&laquo; Anterior</a>
+      {% else %}
+        <button class="btn btn-outline-secondary" disabled>&laquo; Anterior</button>
+      {% endif %}
 
-<div>
-  {% if empleados.has_previous %}
-    <a href="?page={{ empleados.previous_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}">Anterior</a>
-  {% endif %}
-  {% if empleados.has_next %}
-    <a href="?page={{ empleados.next_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}">Siguiente</a>
-  {% endif %}
+      {% if empleados.has_next %}
+        <a href="?page={{ empleados.next_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}" class="btn btn-outline-primary">Siguiente &raquo;</a>
+      {% else %}
+        <button class="btn btn-outline-secondary" disabled>Siguiente &raquo;</button>
+      {% endif %}
+    </div>
+  </div>
 </div>
 {% endblock %}

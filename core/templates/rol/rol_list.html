@@ -6,21 +6,6 @@
 <div class="container py-4">
   <h2 class="mb-4">{{ title }}</h2>
 
-  <!-- Buscador -->
-  <form method="get" class="row g-2 mb-3">
-    <div class="col-md-5">
-      <input type="text" name="q" class="form-control" placeholder="Buscar por nombre o descripción..." value="{{ request.GET.q }}">
-    </div>
-    {% if model_name == 'empleado' %}
-    <div class="col-md-5">
-      <input type="text" name="q2" class="form-control" placeholder="Buscar por cédula..." value="{{ request.GET.q2 }}">
-    </div>
-    {% endif %}
-    <div class="col-md-2">
-      <button type="submit" class="btn btn-primary w-100">Buscar</button>
-    </div>
-  </form>
-
   <!-- Botón crear -->
   <div class="mb-3 text-end">
     <a href="{% url 'core:create_nomina' %}" class="btn btn-success">
@@ -34,9 +19,15 @@
       <thead>
         <tr>
           <th>ID</th>
-          {% for field in fields %}
-            <th>{{ field|capfirst }}</th>
-          {% endfor %}
+          <th>Empleado</th>
+          <th>Año/Mes</th>
+          <th>Sueldo</th>
+          <th>Horas Extra</th>
+          <th>Bono</th>
+          <th>IESS</th>
+          <th>Total Ingresos</th>
+          <th>Total Descuentos</th>
+          <th>Neto</th>
           <th>Acciones</th>
         </tr>
       </thead>
@@ -44,19 +35,64 @@
         {% for obj in objects %}
         <tr>
           <td>{{ obj.id }}</td>
-          {% for field in fields %}
-            <td>{{ objeto.atributo }}</td>
-          {% endfor %}
+          <td>{{ obj.empleado }}</td>
+          <td>{{ obj.aniomes }}</td>
+          <td>{{ obj.sueldo }}</td>
+          <td>{{ obj.horas_extra }}</td>
+          <td>{{ obj.bono }}</td>
+          <td>{{ obj.iess }}</td>
+          <td>{{ obj.tot_ing }}</td>
+          <td>{{ obj.tot_des }}</td>
+          <td>{{ obj.neto }}</td>
           <td>
-            <a href="{% url 'core:update_nomina' model_name obj.id %}" class="btn btn-sm btn-warning">Editar</a>
-            <a href="{% url 'core:delete_nomina' model_name obj.id %}" class="btn btn-sm btn-danger">Eliminar</a>
+            <a href="{% url 'core:UpdateNomina' obj.id %}" class="btn btn-sm btn-warning">Editar</a>
+            <a href="{% url 'core:DeleteNomina' obj.id %}" class="btn btn-sm btn-danger">Eliminar</a>
           </td>
         </tr>
         {% empty %}
-        <tr><td colspan="99">No se encontraron resultados.</td></tr>
+        <tr>
+          <td colspan="11">No se encontraron resultados.</td>
+        </tr>
         {% endfor %}
       </tbody>
     </table>
   </div>
+
+  <!-- Paginación -->
+  <nav aria-label="Page navigation">
+    <ul class="pagination justify-content-center">
+      {% if objects.has_previous %}
+      <li class="page-item">
+        <a class="page-link" href="?page={{ objects.previous_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}" aria-label="Anterior">
+          <span aria-hidden="true">&laquo;</span>
+        </a>
+      </li>
+      {% else %}
+      <li class="page-item disabled">
+        <span class="page-link">&laquo;</span>
+      </li>
+      {% endif %}
+
+      {% for num in objects.paginator.page_range %}
+        {% if objects.number == num %}
+          <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+        {% elif num > objects.number|add:'-3' and num < objects.number|add:'3' %}
+          <li class="page-item"><a class="page-link" href="?page={{ num }}{% if search_query %}&q={{ search_query }}{% endif %}">{{ num }}</a></li>
+        {% endif %}
+      {% endfor %}
+
+      {% if objects.has_next %}
+      <li class="page-item">
+        <a class="page-link" href="?page={{ objects.next_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}" aria-label="Siguiente">
+          <span aria-hidden="true">&raquo;</span>
+        </a>
+      </li>
+      {% else %}
+      <li class="page-item disabled">
+        <span class="page-link">&raquo;</span>
+      </li>
+      {% endif %}
+    </ul>
+  </nav>
 </div>
 {% endblock %}

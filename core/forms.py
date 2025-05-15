@@ -141,19 +141,53 @@ class RolForm(forms.ModelForm):
     aniomes = forms.CharField(
         label="Año y Mes (YYYYMM)",
         validators=[RegexValidator(r'^\d{6}$', 'Formato incorrecto. Debe ser YYYYMM')],
-        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ej: 202505'})
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Ej: 202505',
+            'maxlength': '6',
+        })
     )
 
     class Meta:
         model = Rol
         fields = '__all__'
         widgets = {
-            'sueldo': forms.NumberInput(attrs={'class': 'form-control'}),
-            'horas_extra': forms.NumberInput(attrs={'class': 'form-control'}),
-            'bono': forms.NumberInput(attrs={'class': 'form-control'}),
-            'iess': forms.NumberInput(attrs={'class': 'form-control'}),
-            'tot_ing': forms.NumberInput(attrs={'class': 'form-control'}),
-            'tot_des': forms.NumberInput(attrs={'class': 'form-control'}),
-            'neto': forms.NumberInput(attrs={'class': 'form-control'}),
-            'empleado': forms.Select(attrs={'class': 'form-control'}),
+            'empleado': forms.Select(attrs={
+                'class': 'form-control',
+            }),
+            'sueldo': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Sueldo base',
+                'step': '0.01',
+            }),
+            'horas_extra': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Horas extra',
+                'step': '0.01',
+            }),
+            'bono': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Bono',
+                'step': '0.01',
+            }),
+            'iess': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'IESS',
+                'step': '0.01',
+            }),
+            'tot_ing': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Total ingresos',
+                'step': '0.01',
+            }),
+            'tot_des': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Total descuentos',
+                'step': '0.01',
+            }),
+            'neto': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Neto a recibir',
+                'step': '0.01',
+            }),
         }

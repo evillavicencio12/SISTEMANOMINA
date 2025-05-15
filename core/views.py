@@ -5,6 +5,7 @@ from django.contrib.auth import login as auth_login, logout as auth_logout
 from django.contrib import messages
 from django.core.paginator import Paginator
 from django.db import IntegrityError
+from django.db.models import Q
 from .models import Cargo, Empleado, Departamento, Rol, TipoContrato
 from .forms import CargoForm, DepartamentoForm, EmpleadoForm, RolForm, TipoContratoForm, CustomUserCreationForm, CustomLoginForm
 from django.http import HttpResponse
@@ -114,15 +115,23 @@ def vista_contratos(request):
     return render(request, 'tipoContrato/tipoContrato_list.html', {'tipo_contratos': page_obj, 'search_query': search_query})
 
 @login_required
+@login_required
 def Nominas(request):
     roles = Rol.objects.all()
     search_query = request.GET.get('q', '')
     if search_query:
-        roles = roles.filter(empleado__nombre__icontains=search_query) | roles.filter(empleado__cedula__icontains=search_query)
+        roles = roles.filter(
+            Q(empleado__nombre__icontains=search_query) | Q(empleado__cedula__icontains=search_query)
+        )
     paginator = Paginator(roles, 10)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
-    return render(request, 'rol/rol_list.html', {'roles': page_obj, 'search_query': search_query})
+    return render(request, 'rol/rol_list.html', {
+        'objects': page_obj,
+        'search_query': search_query,
+        'model_name': 'nomina',
+        'title': 'Listado de Roles de Pago',
+    })
 
 # Vistas de crear
 @login_required
@@ -343,3 +352,11 @@ def DeleteEmpleado(request, id):
         'empleado': empleado,
         'title': f'Eliminar Empleado: {empleado.nombre}',
     })
+@login_required
+def DeleteNomina(request, id):
+    rol = get_object_or_404(Rol, pk=id)
+    if request.method == 'POST':
+        rol.delete()
+        messages.success(request, 'Rol eliminado correctamente.')
+        return redirect('core:Nominas')
+    return render(request, 'rol/rol_delete.html', {'rol': rol})
